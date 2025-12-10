@@ -63,7 +63,7 @@ body {
 }
 
 .intro-card .small {
-  font-size: 15px;
+  font-size: 16px;
 }
 
 .intro-actions {
@@ -89,13 +89,6 @@ body {
   font-size: 15px;
   font-family: inherit;
   background: #fffefe;
-}
-
-.label {
-  display: block;
-  font-weight: 600;
-  margin: 0 0 6px;
-  color: #3c3842;
 }
 
 .bg-wrap {
@@ -266,6 +259,12 @@ h1 {
   color: #3f6b58;
 }
 
+.hint {
+  outline: 2px solid #f3b3ce;
+  box-shadow: 0 0 0 6px rgba(243, 179, 206, 0.25);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
 .modal {
   position: fixed;
   inset: 0;
@@ -371,6 +370,12 @@ h1 {
   100% {
     transform: scale(1);
   }
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 6px rgba(243, 179, 206, 0.25); }
+  50% { box-shadow: 0 0 0 10px rgba(243, 179, 206, 0.18); }
+  100% { box-shadow: 0 0 0 6px rgba(243, 179, 206, 0.25); }
 }
 
 @media (max-width: 640px) {

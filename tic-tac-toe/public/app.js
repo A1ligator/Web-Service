@@ -6,20 +6,14 @@ const modal = document.getElementById('modal');
 const modalBody = document.getElementById('modalBody');
 const modalActions = document.getElementById('modalActions');
 const introOverlay = document.getElementById('introOverlay');
-const introYes = document.getElementById('introYes');
-const introNo = document.getElementById('introNo');
-const introForm = document.getElementById('introForm');
-const introChoice = document.getElementById('introChoice');
-const introSave = document.getElementById('introSave');
-const introSkipAfterForm = document.getElementById('introSkipAfterForm');
-const tgHandleInput = document.getElementById('tgHandle');
+const introStart = document.getElementById('introStart');
 
 let board = Array(9).fill('');
 let playerTurn = true;
 let gameOver = false;
 let aiThinking = false;
-let telegramOptIn = false;
-let telegramHandle = '';
+let losses = 0;
+let hintActive = false;
 
 const winningLines = [
   [0, 1, 2],
@@ -37,29 +31,7 @@ const edges = [1, 3, 5, 7];
 
 cells.forEach(cell => cell.addEventListener('click', onPlayerMove));
 resetBtn.addEventListener('click', resetGame);
-introYes.addEventListener('click', () => {
-  introForm.classList.remove('hidden');
-  introChoice.classList.add('hidden');
-  tgHandleInput.focus();
-});
-introNo.addEventListener('click', () => {
-  telegramOptIn = false;
-  closeIntro();
-});
-introSave.addEventListener('click', () => {
-  const raw = tgHandleInput.value.trim();
-  telegramHandle = raw.startsWith('@') ? raw : raw ? `@${raw}` : '';
-  if (!telegramHandle) {
-    tgHandleInput.focus();
-    return;
-  }
-  telegramOptIn = true;
-  closeIntro();
-});
-introSkipAfterForm.addEventListener('click', () => {
-  telegramOptIn = false;
-  closeIntro();
-});
+introStart.addEventListener('click', closeIntro);
 
 function onPlayerMove(event) {
   if (gameOver || !playerTurn || aiThinking) return;
@@ -80,6 +52,7 @@ function onPlayerMove(event) {
     return;
   }
 
+  clearHint();
   setStatus('Ход компьютера…');
   aiThinking = true;
   setTimeout(() => {
@@ -121,6 +94,7 @@ function computerMove() {
 
   playerTurn = true;
   setStatus('Твой ход: крестики');
+  showHintIfNeeded();
 }
 
 function chooseAIMove() {
@@ -163,6 +137,10 @@ function finishGame(result, line) {
     setStatus('Победа! Промокод внутри.');
     showWin(code);
   } else {
+    losses += 1;
+    if (losses >= 3) {
+      hintActive = true;
+    }
     setStatus('Компьютер победил. Попробуем ещё?');
     showLoss();
   }
@@ -180,7 +158,7 @@ function showWin(code) {
       <span id="codeValue">${code}</span>
       <button class="ghost" id="copyCodeBtn">Скопировать</button>
     </div>
-    <div class="note" id="notifyNote">${telegramOptIn ? 'Отправляем уведомление в Telegram…' : 'Промокод готов. Скопируй его и используй.'}</div>
+    <div class="note" id="notifyNote">Отправляем уведомление в Telegram…</div>
   `;
 
   modalActions.innerHTML = `
@@ -202,6 +180,7 @@ function showLoss() {
   modalBody.innerHTML = `
     <h2>Компьютер взял партию</h2>
     <p>Быстрый реванш? Попробуй другую стратегию и забери промокод.</p>
+    ${losses >= 3 ? '<p class="note">Я помогу: на твоём ходу подсвечу лучший ход.</p>' : ''}
   `;
   modalActions.innerHTML = `
     <button class="cta" id="playAgainLoss">Сыграть ещё</button>
@@ -254,6 +233,10 @@ function resetGame() {
     cell.classList.remove('played', 'win');
   });
   setStatus('Твой ход: крестики');
+  clearHint();
+  if (hintActive) {
+    showHintIfNeeded();
+  }
 }
 
 function setStatus(text) {
@@ -276,17 +259,11 @@ async function copyCode(code) {
 
 async function sendWinNotification(code) {
   const note = document.getElementById('notifyNote');
-  if (!telegramOptIn) return;
-  if (!telegramHandle) {
-    if (note) note.textContent = 'Введите Telegram @ник, чтобы бот смог отправить код.';
-    return;
-  }
-
   try {
     const res = await fetch('/api/notify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ result: 'win', code, chatId: telegramHandle })
+      body: JSON.stringify({ result: 'win', code })
     });
     if (!res.ok) {
       throw new Error(await res.text());
@@ -296,6 +273,33 @@ async function sendWinNotification(code) {
     console.error('Notify error', error);
     if (note) note.textContent = 'Не удалось отправить в Telegram. Проверь .env';
   }
+}
+
+function showHintIfNeeded() {
+  if (!hintActive || gameOver || !playerTurn) return;
+  const move = getHintMove();
+  if (move === null || move === undefined) return;
+  clearHint();
+  cells[move].classList.add('hint');
+  setStatus('Подсказка: нажми на подсвеченную клетку.');
+}
+
+function clearHint() {
+  cells.forEach(cell => cell.classList.remove('hint'));
+}
+
+function getHintMove() {
+  // Лучший ход для игрока X: выиграть, заблокировать, центр, угол, ребро.
+  const winning = findCriticalMove('X');
+  if (winning !== null) return winning;
+  const block = findCriticalMove('O');
+  if (block !== null) return block;
+  if (!board[4]) return 4;
+  const corner = corners.find(i => !board[i]);
+  if (corner !== undefined) return corner;
+  const edge = edges.find(i => !board[i]);
+  if (edge !== undefined) return edge;
+  return null;
 }
 
 resetGame();
