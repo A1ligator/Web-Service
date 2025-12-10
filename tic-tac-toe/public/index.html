@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3x3 тактика — Крестики-нолики</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="bg-wrap">
+    <div class="bubble bubble-1"></div>
+    <div class="bubble bubble-2"></div>
+    <div class="bubble bubble-3"></div>
+  </div>
+
+  <main class="shell">
+    <header class="hero">
+      <p class="eyebrow">3x3 тактика</p>
+      <h1>Сыграем партию?</h1>
+      <p class="lede">Лёгкая игра на пару минут: твой ход — крестик, компьютер — нолик. Победа приносит промокод.</p>
+    </header>
+
+    <section class="card">
+      <div class="card-head">
+        <div class="status" id="status">Твой ход: крестики</div>
+        <button class="ghost" id="resetBtn">Новая партия</button>
+      </div>
+
+      <div class="board" id="board" role="grid" aria-label="Поле крестики-нолики">
+        <button class="cell" data-index="0" aria-label="Клетка 1"></button>
+        <button class="cell" data-index="1" aria-label="Клетка 2"></button>
+        <button class="cell" data-index="2" aria-label="Клетка 3"></button>
+        <button class="cell" data-index="3" aria-label="Клетка 4"></button>
+        <button class="cell" data-index="4" aria-label="Клетка 5"></button>
+        <button class="cell" data-index="5" aria-label="Клетка 6"></button>
+        <button class="cell" data-index="6" aria-label="Клетка 7"></button>
+        <button class="cell" data-index="7" aria-label="Клетка 8"></button>
+        <button class="cell" data-index="8" aria-label="Клетка 9"></button>
+      </div>
+
+      <div class="legend">
+        <span class="pill">Ты — X</span>
+        <span class="pill soft">Компьютер — O</span>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal hidden" id="modal">
+    <div class="modal-card">
+      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-actions" id="modalActions"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
