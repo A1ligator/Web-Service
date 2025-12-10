@@ -260,8 +260,8 @@ h1 {
 }
 
 .hint {
-  outline: 2px solid #f3b3ce;
-  box-shadow: 0 0 0 6px rgba(243, 179, 206, 0.25);
+  outline: 3px solid #ff9fc4;
+  box-shadow: 0 0 0 8px rgba(255, 159, 196, 0.3);
   animation: pulse 1.2s ease-in-out infinite;
 }
 
@@ -373,9 +373,9 @@ h1 {
 }
 
 @keyframes pulse {
-  0% { box-shadow: 0 0 0 6px rgba(243, 179, 206, 0.25); }
-  50% { box-shadow: 0 0 0 10px rgba(243, 179, 206, 0.18); }
-  100% { box-shadow: 0 0 0 6px rgba(243, 179, 206, 0.25); }
+  0% { box-shadow: 0 0 0 8px rgba(255, 159, 196, 0.3); }
+  50% { box-shadow: 0 0 0 12px rgba(255, 159, 196, 0.22); }
+  100% { box-shadow: 0 0 0 8px rgba(255, 159, 196, 0.3); }
 }
 
 @media (max-width: 640px) {

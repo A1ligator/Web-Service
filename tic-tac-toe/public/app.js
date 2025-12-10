@@ -14,6 +14,8 @@ let gameOver = false;
 let aiThinking = false;
 let losses = 0;
 let hintActive = false;
+let hintStep = 0;
+const hintSequence = [0, 8, 6, 3]; // фиксированная стратегия: верхний левый → нижний правый → нижний левый → левый центр
 
 const winningLines = [
   [0, 1, 2],
@@ -40,6 +42,9 @@ function onPlayerMove(event) {
 
   placeMark(index, 'X');
   playerTurn = false;
+  if (hintActive && hintSequence[hintStep] === index) {
+    hintStep += 1;
+  }
 
   const winner = detectWinner('X');
   if (winner) {
@@ -93,7 +98,7 @@ function computerMove() {
   }
 
   playerTurn = true;
-  setStatus('Твой ход: крестики');
+  setStatus('Ваш ход: крестики');
   showHintIfNeeded();
 }
 
@@ -152,8 +157,8 @@ function highlightWin(line) {
 
 function showWin(code) {
   modalBody.innerHTML = `
-    <h2>Браво! Ты победила</h2>
-    <p>Лови промокод. Скопируй и используй в течение часа.</p>
+    <h2>Браво! Вы победили</h2>
+    <p>Ловите промокод. Скопируйте и используйте в течение часа.</p>
     <div class="promo-box">
       <span id="codeValue">${code}</span>
       <button class="ghost" id="copyCodeBtn">Скопировать</button>
@@ -179,8 +184,8 @@ function showWin(code) {
 function showLoss() {
   modalBody.innerHTML = `
     <h2>Компьютер взял партию</h2>
-    <p>Быстрый реванш? Попробуй другую стратегию и забери промокод.</p>
-    ${losses >= 3 ? '<p class="note">Я помогу: на твоём ходу подсвечу лучший ход.</p>' : ''}
+    <p>Быстрый реванш? Попробуйте другую стратегию и заберите промокод.</p>
+    ${losses >= 3 ? '<p class="note">Я помогу: на Вашем ходу подсвечу лучший ход.</p>' : ''}
   `;
   modalActions.innerHTML = `
     <button class="cta" id="playAgainLoss">Сыграть ещё</button>
@@ -199,7 +204,7 @@ function showDraw() {
 
   modalBody.innerHTML = `
     <h2>Ничья</h2>
-    <p>Ходы закончились. Давай ещё одну партию?</p>
+    <p>Ходы закончились. Давайте ещё одну партию?</p>
   `;
   modalActions.innerHTML = `
     <button class="cta" id="playAgainDraw">Сыграть ещё</button>
@@ -228,11 +233,12 @@ function resetGame() {
   gameOver = false;
   playerTurn = true;
   aiThinking = false;
+  hintStep = 0;
   cells.forEach(cell => {
     cell.textContent = '';
     cell.classList.remove('played', 'win');
   });
-  setStatus('Твой ход: крестики');
+  setStatus('Ваш ход: крестики');
   clearHint();
   if (hintActive) {
     showHintIfNeeded();
@@ -253,7 +259,7 @@ async function copyCode(code) {
     const note = document.getElementById('notifyNote');
     if (note) note.textContent = 'Промокод скопирован. Приятных покупок!';
   } catch {
-    alert('Не удалось скопировать. Скопируй вручную: ' + code);
+    alert('Не удалось скопировать. Скопируйте вручную: ' + code);
   }
 }
 
@@ -281,7 +287,7 @@ function showHintIfNeeded() {
   if (move === null || move === undefined) return;
   clearHint();
   cells[move].classList.add('hint');
-  setStatus('Подсказка: нажми на подсвеченную клетку.');
+  setStatus('Подсказка: нажмите на подсвеченную клетку.');
 }
 
 function clearHint() {
@@ -289,7 +295,14 @@ function clearHint() {
 }
 
 function getHintMove() {
-  // Лучший ход для игрока X: выиграть, заблокировать, центр, угол, ребро.
+  // Фиксированная стратегия: верхний левый → нижний правый → нижний левый → левый центр.
+  for (let i = hintStep; i < hintSequence.length; i++) {
+    const target = hintSequence[i];
+    if (!board[target]) {
+      return target;
+    }
+  }
+  // Если всё занято, fallback: выигрыш, блок, центр, угол, ребро.
   const winning = findCriticalMove('X');
   if (winning !== null) return winning;
   const block = findCriticalMove('O');
