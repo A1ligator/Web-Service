@@ -148,6 +148,7 @@ function finishGame(result, line) {
     }
     setStatus('Компьютер победил. Попробуем ещё?');
     showLoss();
+    sendLossNotification();
   }
 }
 
@@ -278,6 +279,18 @@ async function sendWinNotification(code) {
   } catch (error) {
     console.error('Notify error', error);
     if (note) note.textContent = 'Не удалось отправить в Telegram. Проверь .env';
+  }
+}
+
+async function sendLossNotification() {
+  try {
+    await fetch('/api/notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ result: 'lose' })
+    });
+  } catch (error) {
+    console.error('Notify loss error', error);
   }
 }
 

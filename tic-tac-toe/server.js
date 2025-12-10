@@ -18,13 +18,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.post('/api/notify', async (req, res) => {
   const { result, code } = req.body || {};
-  if (result !== 'win') {
+  if (result !== 'win' && result !== 'lose') {
     return res.status(200).json({ ok: true, skipped: true });
   }
   if (!BOT_TOKEN) {
     return res.status(500).json({ ok: false, error: 'Missing BOT_TOKEN' });
   }
-  if (!code || typeof code !== 'string') {
+  if (result === 'win' && (!code || typeof code !== 'string')) {
     return res.status(400).json({ ok: false, error: 'Missing promo code' });
   }
 
@@ -32,7 +32,9 @@ app.post('/api/notify', async (req, res) => {
     return res.status(500).json({ ok: false, error: 'Missing CHAT_ID' });
   }
 
-  const text = `Победа! Промокод выдан: ${code}`;
+  const text = result === 'win'
+    ? `Победа! Промокод выдан: ${code}`
+    : 'Проигрыш';
   const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
 
   try {
