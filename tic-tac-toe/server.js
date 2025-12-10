@@ -17,15 +17,20 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.post('/api/notify', async (req, res) => {
-  const { result, code } = req.body || {};
+  const { result, code, chatId } = req.body || {};
   if (result !== 'win') {
     return res.status(200).json({ ok: true, skipped: true });
   }
-  if (!BOT_TOKEN || !CHAT_ID) {
-    return res.status(500).json({ ok: false, error: 'Missing BOT_TOKEN or CHAT_ID' });
+  if (!BOT_TOKEN) {
+    return res.status(500).json({ ok: false, error: 'Missing BOT_TOKEN' });
   }
   if (!code || typeof code !== 'string') {
     return res.status(400).json({ ok: false, error: 'Missing promo code' });
+  }
+
+  const targetChat = typeof chatId === 'string' && chatId.trim() ? chatId.trim() : CHAT_ID;
+  if (!targetChat) {
+    return res.status(400).json({ ok: false, error: 'Missing chat id' });
   }
 
   const text = `Победа! Промокод выдан: ${code}`;
@@ -35,7 +40,7 @@ app.post('/api/notify', async (req, res) => {
     const tgRes = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: CHAT_ID, text })
+      body: JSON.stringify({ chat_id: targetChat, text })
     });
 
     if (!tgRes.ok) {

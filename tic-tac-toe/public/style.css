@@ -14,17 +14,88 @@
   box-sizing: border-box;
 }
 
+.hidden {
+  display: none !important;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
   font-family: 'Manrope', system-ui, -apple-system, sans-serif;
   background: linear-gradient(135deg, #f8ebf1, #eef3f8);
   color: var(--slate);
-  display: grid;
-  place-items: center;
-  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
   position: relative;
   overflow-x: hidden;
+}
+
+.intro-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(10px);
+  display: grid;
+  place-items: center;
+  z-index: 15;
+  padding: 20px;
+}
+
+.intro-overlay.hidden {
+  display: none;
+}
+
+.intro-card {
+  width: min(520px, 100%);
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 18px;
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.14);
+  border: 1px solid #f0dde6;
+  padding: clamp(20px, 4vw, 28px);
+}
+
+.intro-card h2 {
+  margin: 0 0 10px;
+  font-size: clamp(22px, 4vw, 26px);
+  color: #2d2632;
+}
+
+.intro-card .small {
+  font-size: 15px;
+}
+
+.intro-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.intro-actions.space {
+  justify-content: flex-end;
+}
+
+.intro-form {
+  margin-top: 14px;
+}
+
+.intro-form input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #e1d6df;
+  border-radius: 12px;
+  font-size: 15px;
+  font-family: inherit;
+  background: #fffefe;
+}
+
+.label {
+  display: block;
+  font-weight: 600;
+  margin: 0 0 6px;
+  color: #3c3842;
 }
 
 .bg-wrap {
@@ -67,11 +138,14 @@ body {
 .shell {
   position: relative;
   z-index: 1;
-  width: min(960px, 100%);
+  width: min(760px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .hero {
-  margin-bottom: 18px;
+  margin-bottom: 8px;
 }
 
 .eyebrow {
@@ -84,18 +158,18 @@ body {
 }
 
 h1 {
-  margin: 0 0 8px;
+  margin: 0 0 6px;
   font-weight: 700;
-  font-size: clamp(28px, 4vw, 36px);
+  font-size: clamp(26px, 4vw, 34px);
   color: #2d2632;
 }
 
 .lede {
   margin: 0;
   max-width: 640px;
-  color: #4d4b55;
-  font-size: 16px;
-  line-height: 1.6;
+  color: #3f3b46;
+  font-size: 17px;
+  line-height: 1.5;
 }
 
 .card {
@@ -103,7 +177,7 @@ h1 {
   border: 1px solid var(--line);
   border-radius: 16px;
   box-shadow: var(--shadow);
-  padding: clamp(18px, 3vw, 28px);
+  padding: clamp(14px, 2.4vw, 20px);
 }
 
 .card-head {
@@ -138,9 +212,10 @@ h1 {
 
 .board {
   display: grid;
-  grid-template-columns: repeat(3, minmax(90px, 1fr));
-  gap: 12px;
-  margin: 10px 0 16px;
+  grid-template-columns: repeat(3, minmax(80px, 1fr));
+  gap: 10px;
+  margin: 8px auto 12px;
+  width: min(340px, 100%);
 }
 
 .cell {
@@ -148,7 +223,7 @@ h1 {
   border: 1px solid var(--line);
   border-radius: 14px;
   background: white;
-  font-size: clamp(32px, 6vw, 42px);
+  font-size: clamp(28px, 6vw, 36px);
   font-weight: 700;
   color: #b3547c;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
@@ -206,7 +281,7 @@ h1 {
 }
 
 .modal-card {
-  width: min(440px, 100%);
+  width: min(420px, 100%);
   background: white;
   border-radius: 16px;
   padding: 22px;
@@ -285,6 +360,10 @@ h1 {
   margin-top: 10px;
 }
 
+.note.compact {
+  margin-top: 6px;
+}
+
 @keyframes pop {
   0% {
     transform: scale(0.92);
@@ -295,16 +374,7 @@ h1 {
 }
 
 @media (max-width: 640px) {
-  body {
-    padding: 16px;
-  }
-
-  .card-head {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .board {
-    gap: 10px;
-  }
+  body { padding: 12px; }
+  .card-head { flex-direction: column; align-items: flex-start; }
+  .board { width: min(320px, 100%); }
 }

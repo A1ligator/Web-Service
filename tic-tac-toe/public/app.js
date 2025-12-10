@@ -5,11 +5,21 @@ const resetBtn = document.getElementById('resetBtn');
 const modal = document.getElementById('modal');
 const modalBody = document.getElementById('modalBody');
 const modalActions = document.getElementById('modalActions');
+const introOverlay = document.getElementById('introOverlay');
+const introYes = document.getElementById('introYes');
+const introNo = document.getElementById('introNo');
+const introForm = document.getElementById('introForm');
+const introChoice = document.getElementById('introChoice');
+const introSave = document.getElementById('introSave');
+const introSkipAfterForm = document.getElementById('introSkipAfterForm');
+const tgHandleInput = document.getElementById('tgHandle');
 
 let board = Array(9).fill('');
 let playerTurn = true;
 let gameOver = false;
 let aiThinking = false;
+let telegramOptIn = false;
+let telegramHandle = '';
 
 const winningLines = [
   [0, 1, 2],
@@ -27,6 +37,29 @@ const edges = [1, 3, 5, 7];
 
 cells.forEach(cell => cell.addEventListener('click', onPlayerMove));
 resetBtn.addEventListener('click', resetGame);
+introYes.addEventListener('click', () => {
+  introForm.classList.remove('hidden');
+  introChoice.classList.add('hidden');
+  tgHandleInput.focus();
+});
+introNo.addEventListener('click', () => {
+  telegramOptIn = false;
+  closeIntro();
+});
+introSave.addEventListener('click', () => {
+  const raw = tgHandleInput.value.trim();
+  telegramHandle = raw.startsWith('@') ? raw : raw ? `@${raw}` : '';
+  if (!telegramHandle) {
+    tgHandleInput.focus();
+    return;
+  }
+  telegramOptIn = true;
+  closeIntro();
+});
+introSkipAfterForm.addEventListener('click', () => {
+  telegramOptIn = false;
+  closeIntro();
+});
 
 function onPlayerMove(event) {
   if (gameOver || !playerTurn || aiThinking) return;
@@ -147,7 +180,7 @@ function showWin(code) {
       <span id="codeValue">${code}</span>
       <button class="ghost" id="copyCodeBtn">Скопировать</button>
     </div>
-    <div class="note" id="notifyNote">Отправляем уведомление в Telegram…</div>
+    <div class="note" id="notifyNote">${telegramOptIn ? 'Отправляем уведомление в Telegram…' : 'Промокод готов. Скопируй его и используй.'}</div>
   `;
 
   modalActions.innerHTML = `
@@ -207,6 +240,10 @@ function closeModal() {
   modal.classList.add('hidden');
 }
 
+function closeIntro() {
+  introOverlay.classList.add('hidden');
+}
+
 function resetGame() {
   board = Array(9).fill('');
   gameOver = false;
@@ -239,11 +276,17 @@ async function copyCode(code) {
 
 async function sendWinNotification(code) {
   const note = document.getElementById('notifyNote');
+  if (!telegramOptIn) return;
+  if (!telegramHandle) {
+    if (note) note.textContent = 'Введите Telegram @ник, чтобы бот смог отправить код.';
+    return;
+  }
+
   try {
     const res = await fetch('/api/notify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ result: 'win', code })
+      body: JSON.stringify({ result: 'win', code, chatId: telegramHandle })
     });
     if (!res.ok) {
       throw new Error(await res.text());

@@ -16,6 +16,29 @@
     <div class="bubble bubble-3"></div>
   </div>
 
+  <div class="intro-overlay" id="introOverlay">
+    <div class="intro-card">
+      <p class="eyebrow">Добро пожаловать</p>
+      <h2>Хочешь получить промокод в Telegram?</h2>
+      <p class="lede small">Бот пришлёт промо только тебе. Нажми “Да”, введи свой @ник (бот должен быть открыт) — и код улетит в личку при победе.</p>
+
+      <div class="intro-form hidden" id="introForm">
+        <label for="tgHandle" class="label">Твой Telegram @ник</label>
+        <input id="tgHandle" type="text" placeholder="@username" autocomplete="off" />
+        <p class="note compact">Убедись, что нажала Start у бота, иначе он не сможет написать.</p>
+        <div class="intro-actions space">
+          <button class="cta" id="introSave">Продолжить</button>
+          <button class="ghost-line" id="introSkipAfterForm">Пропустить</button>
+        </div>
+      </div>
+
+      <div class="intro-actions" id="introChoice">
+        <button class="cta" id="introYes">Да, хочу в Telegram</button>
+        <button class="ghost-line" id="introNo">Нет, просто сыграть</button>
+      </div>
+    </div>
+  </div>
+
   <main class="shell">
     <header class="hero">
       <p class="eyebrow">3x3 тактика</p>
